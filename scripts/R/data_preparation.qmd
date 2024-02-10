@@ -1,0 +1,468 @@
+---
+title: "ml_update"
+format: html
+editor: visual
+---
+
+# Packages
+```{r}
+library(tidyverse)
+library(broom)
+library(nlme)
+library(car)
+library(haven)
+library(shiny)
+library(feather)
+```
+
+# Data Cleaning
+
+```{r}
+# Import Harmonised LASI_DAD 
+H_DAD <- read_dta("/path/to/data/dir/H_DAD.dta")
+
+# Import Harmonised LASI data
+load("/path/to/data/dir/H_LASI_a3.rdata")
+H_LASI_a3 <- as_tibble(H_LASI_a3)
+
+# Import overall LASI Data
+load("/path/to/data/dir/lasi_w1b_ind_bm.rdata")
+lasi_w1b_ind_bm <- as_tibble(lasi_w1b_ind_bm)
+
+# Join Harmonised LASI and Harmonised LASI DAD datasets using "prim_key"
+lasi_data <- inner_join(H_DAD, H_LASI_a3, by = "prim_key")
+# Join above combined dataset with overall non-harmonised LASI data
+lasi_overall <- inner_join(lasi_data, lasi_w1b_ind_bm, by = "prim_key")
+```
+
+
+```{r}
+# Select the variables that were available to clinicians at the time they performed Clinical Dementia Rating. Variables are listed above the variable name
+lasi_ml_data <- lasi_overall %>% 
+  select(prim_key,
+         r1wtresp.x,
+         # Age
+         r1agey.x,
+         # Sex
+         ragender.x,
+         # Years Edu
+         raedyrs.x,
+         # Marital Status
+         r1mstat,
+         # Occupation
+         r1jcocc_l,
+         # Literacy, rural, education used for subsetting the data and not included as a variable available to clinicians
+         r1illiterate,
+         hh1rural,
+         # Medical Hx
+         # Dementia and alzheimers
+         r1alzdeme,
+         # Depression and other psychological conditions
+         r1psyche,
+         # Stroke
+         r1stroke,
+         # Urinary Incontinence
+         r1urinae,
+         # Heart Disease
+         r1hearte,
+         # Diabetes
+         r1diabe,
+         # High Blood Pressure
+         r1hibpe,
+         # Systolic Blood Pressure Mean
+         r1systo.x,
+         # Diastolic Blood Pressure Mean
+         r1diasto.x,
+         # Self-Rated Memory
+         r1i_memory,
+         # Memory status compared with 2 years ago
+         r1i_compmem,
+         # Sensory Impairment
+         r1i_hear,
+         # Combined to form r1jpscore
+         r1sim_score,
+         r1pro_score,
+         # Hindi Mental State Exam
+         r1hmse_score,
+         r1hmse_scorz,
+         # Center for Epidemiological Studies-Depression
+         r1cesd10.x,
+         # Trouble Concentrating
+         r1mindtsl,
+         # Felt Depressed
+         r1depresl,
+         # Everything an effor
+         r1effortl,
+         # Felt Tired or low energy
+         r1ftiredl,
+         # Was Happy
+         r1whappyl,
+         # Felt lonely
+         r1flonel,
+         # Felt overall satisfied
+         r1fsatisl,
+         # Felt afraid of something
+         r1fearfll,
+         # Felt hopeful
+         r1fhopel,
+         # Bothered by little things
+         r1botherl,
+         # Anxiety Inventory (BAI)
+         r1anx5,
+         # BAI worst happening
+         r1worst,
+         # BAI nervous
+         r1nerv,
+         # BAI hands trembling
+         r1tremb,
+         # BAI fear of dying
+         r1fdying,
+         # BAI felt faint
+         r1faint,
+         # Informant Relationship with R
+         r1inf_rel,
+         # Informant whether provides care for R
+         r1inf_care,
+         # Number of years informant know R
+         r1inf_yrs,
+         # How often informant saw R in last year
+         r1inf_freq,
+         # Blessed Test Part 1 and 2 
+         r1bl1score,
+         r1bl2score,
+         # JORM Score
+         r1iqscore1:r1jormscore,
+         # Telephone Interview for cognitive status
+         r1scis:r1tics_score,
+         # Hand sequencing test
+         r1ef_palm:r1ef_score,
+         # Token Test
+         r1tt_crcl:r1tt_score,
+         # Judgement and Problem Solving 
+         r1jp_animl:r1pro_score,
+         # Cognitive Activity Score
+         r1csi1:r1csi15,
+         # Cognition Elbow
+         r1elbow,
+         # Cognition Hammer
+         r1hammer,
+         # Cognition Store
+         r1store,
+         # Cognition Point
+         r1point,
+         # Word List Trial 1
+         r1word1,
+         # Word List Trial 2
+         r1word2,
+         # Word List Trial 3
+         r1word3,
+         # word learning total
+         r1word_total,
+         # Word List recognition original
+         r1wre_org,
+         # word list recognition new
+         r1wre_foil,
+         # word list recognition (org + foil)
+         r1wre_score,
+         # Community Screening Interview for Dementia
+         r1csid_score,
+         ## Brave man story
+         r1bm_s1:r1bm_recl_d,
+         ## Robbery story 
+         r1lmb_s1:r1lmb_recl_d,
+         # Logical memory recall
+         r1log_rcmix,
+         r1log_wron,
+         r1log_reco,
+         # Constructional Praxis
+         r1cp_circle:r1cpr_score,
+         # Clock Drawing
+         r1dr_clock3,
+         # Raven's test
+         r1rv_score,
+         # Go-no-go
+         r1go_score1:r1go_score,
+         # Serial 7s
+         r1ser7.x,
+         # Symbol Cancellation
+         r1sc_anw,
+         # Digit Span
+         r1ds_for:r1ds_back,
+         # Retrieval fluency
+         r1verbal:r1verbal_prb,
+         ## Functional Scores
+         # Total ADL
+         r1adla_d,
+         # Walking
+         r1walkra.x,
+         # Bathing
+         r1batha.x,
+         # Dressing
+         r1dressa.x,
+         # Eating
+         r1eata.x,
+         # in/out bed
+         r1beda.x,
+         # Toilet
+         r1toilta.x,
+         # Total IADLS
+         r1iadltot1_d,
+         # Making Phone calls
+         r1phonea.x,
+         # Handling money,
+         r1moneya.x,
+         # Taking medications
+         r1medsa.x,
+         # Shopping
+         r1shopa.x,
+         # Preparing meals
+         r1mealsa.x,
+         # Doing housework
+         r1housewka.x,
+         # Getting Around
+         r1geta.x,
+         # Walk 100 yards
+         r1walk100a,
+         # Sit 2 hours
+         r1sita,
+         # Get up from chair
+         r1chaira,
+         # Stooping or kneeling
+         r1stoopa,
+         # Extending Arms
+         r1armsa,
+         # Pushing large objects,
+         r1pusha,
+         # Lifting large objects,
+         r1lifta,
+         # Picking up a coin
+         r1dimea,
+         # Climb 1 flight of stairs
+         r1clim1a,
+         # Hours day watching TV
+         r1act_tv,
+         # Hours day reading
+         r1act_read,
+         # Hours day doing chores
+         r1act_chor,
+         # Hours day using computer 
+         r1act_comp,
+         # Hours day napping
+         r1act_nap,
+         # Whether prepares hot meals
+         r1act_meal,
+         # Whether can travel by themselves
+         r1act_trav,
+         # Whether use public transport
+         r1act_pubt,
+         # How often goes to work/volunteers
+         r1act_work,
+         # How often goes to store or market
+         r1act_stor,
+         # How often goes for walks
+         r1act_walk,
+         # How often does yoga or other exercise
+         r1act_spor,
+         # 10/66 Informant Questionnaire
+         r1ten1,
+         r1ten2,
+         r1ten3,
+         r1ten4,
+         r1ten5,
+         # Computation sale in shop
+         mh046,
+         # Computation lottery
+         mh047,
+         # neurological problems
+         ht009,
+         r1cdr_incon,
+         r1cdr_final,
+         # Clinician Ratings
+         r1cdr_final:r1raterid3,
+    # missing intro_101s2_12, intro_10s1_1
+  ) %>% 
+  dplyr::select(!starts_with("r1f"))
+```
+
+
+```{r}
+# Rename variables to make reorganising dataset more efficient
+lasi_ml_data2 <- lasi_ml_data %>% 
+  rename(
+    r1cdrmem_1 = r1cdr_mem1,
+    r1cdrori_1 = r1cdr_ori1,
+    r1cdrjud_1 = r1cdr_jud1,
+    r1cdrcom_1 = r1cdr_com1,
+    r1cdrhom_1 = r1cdr_hom1,
+    r1cdrper_1 = r1cdr_per1,
+    r1cdrscor_1 = r1cdr_scor1,
+    r1raterid_1 = r1raterid1,
+    r1cdrmem_2 = r1cdr_mem2,
+    r1cdrori_2 = r1cdr_ori2,
+    r1cdrjud_2 = r1cdr_jud2,
+    r1cdrcom_2 = r1cdr_com2,
+    r1cdrhom_2 = r1cdr_hom2,
+    r1cdrper_2 = r1cdr_per2,
+    r1cdrscor_2 = r1cdr_scor2,
+    r1raterid_2 = r1raterid2,
+    r1cdrmem_3 = r1cdr_mem3,
+    r1cdrori_3 = r1cdr_ori3,
+    r1cdrjud_3 = r1cdr_jud3,
+    r1cdrcom_3 = r1cdr_com3,
+    r1cdrhom_3 = r1cdr_hom3,
+    r1cdrper_3 = r1cdr_per3,
+    r1cdrscor_3 = r1cdr_scor3,
+    r1raterid_3 = r1raterid3,
+  )
+
+
+
+all_columns <- names(lasi_ml_data)
+# Remove these columns as predictors
+columns_to_exclude <- c("r1raterid_1",
+                        "r1raterid_2",
+                        "r1raterid_3",
+                        "r1cdrmem_1",
+                        "r1cdrmem_2",
+                        "r1cdrmem_3",
+                        "r1cdrori_1",
+                        "r1cdrori_2",
+                        "r1cdrori_3",
+                        "r1cdrjud_1",
+                        "r1cdrjud_2",
+                        "r1cdrjud_3",
+                        "r1cdrcom_1",
+                        "r1cdrcom_2",
+                        "r1cdrcom_3",
+                        "r1cdrhom_1",
+                        "r1cdrhom_2",
+                        "r1cdrhom_3",
+                        "r1cdrper_1",
+                        "r1cdrper_2",
+                        "r1cdrper_3",
+                        "r1cdrscor_1",
+                        "r1cdrscor_2",
+                        "r1cdrscor_3"
+                        )
+exclude_indices <- match(columns_to_exclude, all_columns)
+selected_columns <- all_columns[-exclude_indices]
+```
+
+
+
+
+
+
+```{r}
+# Convert the data to long format with separate rows for each rater's ratings. Allows for separation of the data by rater 
+long_lasi_ml <- lasi_ml_data2 %>%
+  mutate(cdr =
+           case_when(
+             r1cdr_final == 0 ~ 0,
+             r1cdr_final == 0.5 ~ 0,
+             r1cdr_final == 1 ~ 1,
+             r1cdr_final == 2 ~ 1,
+             r1cdr_final == 3 ~ 1,
+           )) %>% 
+  dplyr::select(!r1cdr_final) %>% 
+  dplyr::select(!r1cdrmem_1:r1cdrscor_3)
+
+long_lasi_ind_clin <- long_lasi_ml %>%
+    pivot_longer(cols = c(r1raterid_1, r1raterid_2, r1raterid_3), 
+   names_to = c('.value', 'grp'),
+   names_pattern = "(.+)_(.+)") %>%
+  dplyr::select(-grp) %>% 
+  dplyr::filter(!is.na(cdr))
+
+
+long_lasi_ml <- long_lasi_ml %>% 
+  dplyr::select(!r1raterid_1:r1raterid_3) %>% 
+  # Remove participants who were not rated
+  dplyr::filter(!is.na(cdr)) 
+
+
+```
+
+```{r}
+# Assess the number of NA values in the individual components of the JORM IQCODE assessment. Allows for assessment of JORM's ability as a predictor without considering questions that are heavily imputed
+na_sum <- colSums(is.na(long_lasi_ml[ , 42:58]))
+print(na_sum)
+```
+
+```{r}
+# Average the columns to calculate an overall jorm score minus the questions with large number of missingness
+columns_to_average <- c("r1iqscore1", 
+           "r1iqscore2",
+           "r1iqscore3", 
+           "r1iqscore5", 
+           "r1iqscore6",
+           "r1iqscore7",
+           "r1iqscore12",
+           "r1iqscore13",
+           "r1iqscore15", 
+           "r1iqscore16")
+
+# Remove the columns with a larger amount of missingness (and therefore imputation) and recalculate JORM score
+long_lasi_miss_jorm <- long_lasi_ml %>% 
+  dplyr::select(
+    !r1iqscore4,
+    !r1iqscore8,
+    !r1iqscore9,
+    !r1iqscore10,
+    !r1iqscore11,
+    !r1iqscore14,
+    ) %>% 
+  mutate(miss_jorm = rowMeans(select(., columns_to_average), na.rm = TRUE))
+```
+
+
+```{r}
+# Sum the number of NA values for all the variables in the dataset
+na_sum <- colSums(is.na(long_lasi_ml))
+print(na_sum)
+
+# Change NA values to -100 to be effectively ignored by the ML model
+replacement_value <- -100
+# Perform NA value changes to the overall dataset
+long_lasi_ml <- long_lasi_ml %>% 
+  mutate(across(where(is.numeric), ~ if_else(is.na(.x), replacement_value, .x)))
+
+# Perform NA value changes to the dataset with the recalculated JORM score (minus the individual questions with a large amount of missingess)
+long_lasi_ml_miss_jorm <- long_lasi_miss_jorm %>% 
+  mutate(across(where(is.numeric), ~ if_else(is.na(.x), replacement_value, .x)))
+
+# Perform NA value changes to the dataset that can be used to subset by individual clinician
+long_lasi_ind_clin <- long_lasi_ind_clin %>% 
+  mutate(across(where(is.numeric), ~ if_else(is.na(.x), replacement_value, .x)))
+```
+
+# Demographic Information
+
+```{r}
+# Define demographic columns of interest to provide summary statistics
+demo_columns <- c("r1agey.x", "raedyrs.x")
+demo_cat_columns <- c("r1illiterate", "r1mstat", "hh1rural", "ragender.x")
+
+
+# Loop through numeric columns
+for (i in demo_columns) {
+  print(i)
+  print(mean(long_lasi_ml[[i]], na.rm = TRUE))
+  print(sd(long_lasi_ml[[i]], na.rm = TRUE))
+}
+
+# Loop through categorical columns
+for (i in demo_cat_columns) {
+  print(i)
+  print(table(long_lasi_ml[[i]], useNA = "always"))
+}
+
+```
+
+
+```{r}
+# Save the datasets to the working directory
+write_feather(long_lasi_ml, "lasi.feather")
+write_feather(long_lasi_miss_jorm, "lasi_miss_jorm.feather")
+write_feather(long_lasi_ind_clin, "ind_clin.feather")
+```
