@@ -25,7 +25,7 @@ import shap
 import joblib
 
 # Replace with path to clinician data
-clin = feather.read_feather('/path/to/your/ind_clin.feather')
+clin0 = feather.read_feather('/path/to/data/dir/ind_clin.feather')
 
 ## Choose rater ID
 #Rater 1 - 7049
@@ -37,7 +37,7 @@ clin = feather.read_feather('/path/to/your/ind_clin.feather')
 #Rater 7 - 7046
 #Rater 8 - 7042
 #Rater 9 - 7023
-clin0 = clin[clin['r1raterid'] == ]
+clin0 = clin0[clin0['r1raterid'] == 7023]
 
 
 # Setting up Predictors and Result
@@ -46,8 +46,9 @@ X = clin0.drop('cdr', axis = 1).copy()
 X = X.drop('prim_key', axis = 1).copy()
 X = X.drop('hh1rural', axis = 1).copy()
 X = X.drop('r1illiterate', axis = 1).copy()
-X = X.drop('r1cdr_incon', axis = 1).copy()
+#X = X.drop('r1cdr_incon', axis = 1).copy()
 X = X.drop('r1raterid', axis = 1).copy()
+#X = X.drop('r1cdrscor', axis = 1).copy()
 X.head()
 
 y = clin0['cdr'].copy()
@@ -111,7 +112,7 @@ X_transform = X_transform.rename(
         'r1i_compmem' : 'Compared Memory Status (2 years ago)',
         'r1i_hear' : 'Sensory Impairment',
         'r1hmse_score' : 'Hindi Mental State Exam',
-        'r1hmse_scorz' : 'Stdized Hindi Mental State Exam',
+        #'r1hmse_scorz' : 'Stdized Hindi Mental State Exam',
         'r1cesd10.x' : 'Center for Epidemiological Studies - Depression',
         'r1mindtsl' : 'Trouble Concentrating',
         'r1depresl' : 'Felt Depressed',
@@ -156,18 +157,18 @@ X_transform = X_transform.rename(
         'r1coconut' : 'Cognition - Coconut',
         'r1prime' : 'Cognition - Prime Minister',
         'r1tics_score' : 'Telephone Interview Cognitive Status',
-        'r1ef_palm' : 'Repeat Palm-Up, Palm-Down',
-        'r1ef_clench' : 'Clenched Extended Hand Movement',
-        'r1ef_fist' : 'Fist-Side-Palm Test',
-        'r1ef_score' : 'Hand Sequencing Score',
-        'r1tt_crcl' : 'Identify Circle',
-        'r1tt_sq' : 'Identify Square',
-        'r1tt_dmnd' : 'Identify Diamond',
-        'r1tt_blckcrcl' : 'Identify Black Circle/Diamond',
-        'r1ttblsqr' : 'Identify Blue/Yellow Square',
-        'r1tt_yldmnd' : 'Identify Yellow Diamond, Blue Circle',
-        'r1tt_ylsqr' : 'Identify Yellow Square, Black Circle',
-        'r1tt_score' : 'Token Test Score',
+        #'r1ef_palm' : 'Repeat Palm-Up, Palm-Down',
+        #'r1ef_clench' : 'Clenched Extended Hand Movement',
+        #'r1ef_fist' : 'Fist-Side-Palm Test',
+        #'r1ef_score' : 'Hand Sequencing Score',
+        #'r1tt_crcl' : 'Identify Circle',
+        #'r1tt_sq' : 'Identify Square',
+        #'r1tt_dmnd' : 'Identify Diamond',
+        #'r1tt_blckcrcl' : 'Identify Black Circle/Diamond',
+        #'r1ttblsqr' : 'Identify Blue/Yellow Square',
+        #'r1tt_yldmnd' : 'Identify Yellow Diamond, Blue Circle',
+        #'r1tt_ylsqr' : 'Identify Yellow Square, Black Circle',
+        #'r1tt_score' : 'Token Test Score',
         'r1jp_animl' : 'Animal Similarites',
         'r1jp_flwr' : 'Flower Similarities',
         'r1jplie' : 'Lie/Mistake Differences',
@@ -175,46 +176,46 @@ X_transform = X_transform.rename(
         'r1jp_rupee1' : 'Coins for One Rupee',
         'r1jp_rupee2' : 'Coins for 6.5 Rupees',
         'r1jp_fndkid' : 'Find Lost Child',
-        'r1sim_score' : 'Similarity and Differences Score',
-        'r1pro_score' : 'Problem Solving Score',
-        'r1ds_back' : 'Digit Span Backward',
-        'r1ds_for' : 'Digit Span Forward',
-        'r1csi1' : 'General Decline in Mental Function',
-        'r1csi2' : 'Remebering Things is a Problem',
-        'r1csi3' : 'Forget Where Put Things',
-        'r1csi4' : 'Forget Where Things Are Kept',
-        'r1csi5' : 'Forget Names of Friends',
-        'r1csi6' :  'Forget Names of Family',
-        'r1csi7' : 'Forget Statement while Talking',
-        'r1csi8' : 'Difficulty Finding Right Words',
-        'r1csi9' : 'Using Wrong Words',
-        'r1csi10' : 'Tend to Talk About What Happened Long Ago',
-        'r1csi11' : 'Forget When Last Saw Informant',
-        'r1csi12' : 'Forget What Happened the Day Before',
-        'r1csi13' : 'Forget Where They Are',
-        'r1csi14' : 'Get Lost in the Community',
-        'r1csi15' : 'Get Lost in Home',
+        #'r1sim_score' : 'Similarity and Differences Score',
+        #'r1pro_score' : 'Problem Solving Score',
+        #'r1ds_back' : 'Digit Span Backward',
+        #'r1ds_for' : 'Digit Span Forward',
+        #'r1csi1' : 'General Decline in Mental Function',
+        #'r1csi2' : 'Remebering Things is a Problem',
+        #'r1csi3' : 'Forget Where Put Things',
+        #'r1csi4' : 'Forget Where Things Are Kept',
+        #'r1csi5' : 'Forget Names of Friends',
+        #'r1csi6' :  'Forget Names of Family',
+        #'r1csi7' : 'Forget Statement while Talking',
+        #'r1csi8' : 'Difficulty Finding Right Words',
+        #'r1csi9' : 'Using Wrong Words',
+        #'r1csi10' : 'Tend to Talk About What Happened Long Ago',
+        #'r1csi11' : 'Forget When Last Saw Informant',
+        #'r1csi12' : 'Forget What Happened the Day Before',
+        #'r1csi13' : 'Forget Where They Are',
+        #'r1csi14' : 'Get Lost in the Community',
+        #'r1csi15' : 'Get Lost in Home',
         'r1elbow' : 'Cognition - Elbow',
         'r1hammer' : 'Cognition - Hammer',
         'r1store' : 'Cognition - Store',
         'r1point' : 'Cognition - Point',
-        'r1word1' : 'Word List Trial 1',
-        'r1word2' : 'Word List Trial 2',
-        'r1word3' : 'Word List Trial 3',
-        'r1word_total' : 'Word List Total',
-        'r1wre_org' : 'Word List Recognition Original',
-        'r1wre_foil' : 'Word List Recognition New',
-        'r1wre_score' : 'Word List Recognition Score',
+        #'r1word1' : 'Word List Trial 1',
+        #'r1word2' : 'Word List Trial 2',
+        #'r1word3' : 'Word List Trial 3',
+        #'r1word_total' : 'Word List Total',
+        #'r1wre_org' : 'Word List Recognition Original',
+        #'r1wre_foil' : 'Word List Recognition New',
+        #'r1wre_score' : 'Word List Recognition Score',
         'r1csid_score' : 'Coomunity Screeing Interview of Dementia',
-        'r1rv_score' : 'Ravens Test',
+        #'r1rv_score' : 'Ravens Test',
         'r1ser7.x' : 'Serial 7s',
-        'r1go_score1' : 'Go-no-go Trial 1',
-        'r1go_score2' : 'Go-no-go Trial 2',
-        'r1go_score' : 'Go-no-go Total',
-        'r1sc_anw' : 'Symbol Cancellation',
-        'r1verbal' : 'Verbal Fluency Animal Naming - Correct',
-        'r1verbal_inc' : 'Verbal Fluency Animal Naming - Incorrect',
-        'r1verbal_prb' : 'Verbal Fluency Animal Naming - Problem',
+        #'r1go_score1' : 'Go-no-go Trial 1',
+        #'r1go_score2' : 'Go-no-go Trial 2',
+        #'r1go_score' : 'Go-no-go Total',
+        #'r1sc_anw' : 'Symbol Cancellation',
+        #'r1verbal' : 'Verbal Fluency Animal Naming - Correct',
+        #'r1verbal_inc' : 'Verbal Fluency Animal Naming - Incorrect',
+        #'r1verbal_prb' : 'Verbal Fluency Animal Naming - Problem',
         'r1adla_d' : 'Total Activities of Daily Living',
         'r1walkra.x' : 'Difficulty Walking',
         'r1batha.x' : 'Difficulty Bathing',
@@ -259,30 +260,59 @@ X_transform = X_transform.rename(
         'mh046' : 'Computing Sale in Shop',
         'mh047' : 'Computing Lottery',
         'ht009' : 'History Neurological Problems',
-        'r1bm_imm_d' : 'Brave Man Immediate 10 Point Score',
-        'r1bm_immex' : 'Brave Man Immediate Summary Score Exact',
-        'r1bm_imm' : 'Brave Man Immediate Summary Score',
-        'r1bm_recl' : 'Brave Man Recall Summary Score',
-        'r1bm_s4' : 'Brave Man Recall Story Point 4',
+        #'r1bm_imm_d' : 'Brave Man Immediate 10 Point Score',
+        #'r1bm_immex' : 'Brave Man Immediate Summary Score Exact',
+        #'r1bm_imm' : 'Brave Man Immediate Summary Score',
+        #'r1bm_recl' : 'Brave Man Recall Summary Score',
+        #'r1bm_s4' : 'Brave Man Recall Story Point 4',
         'raedyrs.x' : 'Years of Education',
-        'r1bm_s7' : 'Brave Man Recall Story Point 7',
-        'r1cpr_circle' : 'Drawing Circle Recall',
-        'r1cp_circle' : 'Drawing Circle Score',
-        'r1cp_rectan' : 'Drawing Rectangle Score',
-        'r1cpr_rectan' :'Drawing Rectangle Recall',
-        'r1cp_cube' : 'Drawing Cube Score',
-        'r1cpr_cube' : 'Drawing Cube Recall',
-        'r1cp_diamon' : 'Drawing Diamond Score',
-        'r1cpr_diamon' : 'Drawing Diamond Recall',
-        'r1cp_score' : 'Constructional Praxis Score',
-        'r1cpr_score' : 'Constructional Praxis Recall Score',
-        'r1lmb_s16' : 'Robbery Story Point 16',
-        'r1lmb_s8' : 'Robbery Story Point 8',
-        'r1lmb_recl_d' : 'Robbery Story Delayed Recall',
-        'r1lmb_imm' : 'Robbery Story Immediate Recall',
-        'r1lmb_imm_d' : 'Robbery Story Immediate Recall with Approximation',
-        'r1bm_recl_d' : 'Brave Man Story Immediate Recall with Approximation',
-        'r1lmb_s22' : 'Robbery Storcy Point 22'
+        #'r1bm_s7' : 'Brave Man Recall Story Point 7',
+        #'r1cpr_circle' : 'Drawing Circle Recall',
+        #'r1cp_circle' : 'Drawing Circle Score',
+        #'r1cp_rectan' : 'Drawing Rectangle Score',
+        #'r1cpr_rectan' :'Drawing Rectangle Recall',
+        #'r1cp_cube' : 'Drawing Cube Score',
+        #'r1cpr_cube' : 'Drawing Cube Recall',
+        #'r1cp_diamon' : 'Drawing Diamond Score',
+        #'r1cpr_diamon' : 'Drawing Diamond Recall',
+        #'r1cp_score' : 'Constructional Praxis Score',
+        #'r1cpr_score' : 'Constructional Praxis Recall Score',
+        #'r1lmb_s16' : 'Robbery Story Point 16',
+        #'r1lmb_s8' : 'Robbery Story Point 8',
+        #'r1lmb_recl_d' : 'Robbery Story Delayed Recall',
+        #'r1lmb_imm' : 'Robbery Story Immediate Recall',
+        #'r1lmb_imm_d' : 'Robbery Story Immediate Recall with Approximation',
+        #'r1bm_recl_d' : 'Brave Man Story Immediate Recall with Approximation',
+        #'r1lmb_s22' : 'Robbery Storcy Point 22'
+        'r1bl1_1': 'Blessed Test - Performing Household Tasks',
+        'r1bl1_2' : 'Blessed Test - Coping with Small Amounts of Money',
+        'r1bl1_3' : 'Blessed Test - Remembering Short List of Item',
+        'r1bl1_4' : 'Blessed Test - Managing Familiar Indoor Locations',
+        'r1bl1_5' : 'Blessed Test - Managing Familiar Streets',
+        'r1bl1_6' : 'Blessed Test - Ability to Grasp Situations',
+        'r1bl1_7' : 'Blessed Test - Ability to Recall Recent Events',
+        'r1bl1_8' : 'Blessed Test - Tends to Dwell on the Past',
+        'r1bl2_2r' : 'Blessed Test - HFeeds Self',
+        'r1bl2_3r' : 'Blessed Test - Clean Self After Using Bathroom',
+        'r1bl2_4r' : 'Blessed Test -  Dress Self Unaided',
+        'r1csi4' : 'CSI - Forget Where Things Are Kept',
+        'r1csi1' : 'CSI - General Decline Mental Function',
+        'r1csi2' : 'CSI - Remembering is a Problem',
+        'r1csi3' : 'CSI - Forget Where Put Things',
+        'r1csi5' : 'CSI - Forget Names of Friends',
+        'r1csi6' : 'CSI - Forget Names of Family',
+        'r1csi7' : 'CSI - Forget Saying Middle of Sentence',
+        'r1csi8' : 'CSI - Difficulty Finding Right Words',
+        'r1csi9' : 'CSI - Use Wrong Words',
+        'r1csi10' : 'CSI - Tend to Talk About Long Ago Past',
+        'r1csi11' : 'CSI - Forget When Last Saw Informant',
+        'r1csi12' : 'CSI - Forget What Happened Day Before',
+        'r1csi13' : 'CSI - Forget Where They Are',
+        'r1csi14' : 'CSI - Get Lost in Community',
+        'r1csi15' : 'CSI - Get Lost in Home',
+        'r1sim_score' : 'Similarity and Difference Summary Score',
+        'r1pro_score' : 'Problem Solving Summary Score',
+        'r1wtresp.x' : 'Participant Survey Weight'
    }
 )
 
@@ -418,28 +448,9 @@ best_model.fit(X_train_full, y_train_full)
 y_test_pred = best_model.predict_proba(X_test)[:, 1]
 auc_score = roc_auc_score(y_test, y_test_pred)
 print(f"AUC on test set: {auc_score}")
-#0.89
+#0.97
 
-# Convert probabilities to binary predictions using a threshold (e.g., 0.5)
-threshold = 0.11
-y_test_pred_binary = (y_test_pred > threshold).astype(int)
 
-# Generate a confusion matrix
-conf_matrix = confusion_matrix(y_test, y_test_pred_binary)
-
-# Display the confusion matrix
-print("Confusion Matrix:")
-print(conf_matrix)
-
-# Calculate sensitivity (recall)
-sensitivity = conf_matrix[1, 1] / (conf_matrix[1, 1] + conf_matrix[1, 0])
-
-# Calculate specificity
-specificity = conf_matrix[0, 0] / (conf_matrix[0, 0] + conf_matrix[0, 1])
-
-# Display the results
-print(f"Sensitivity (Recall): {sensitivity:.4f}")
-print(f"Specificity: {specificity:.4f}")
 
 #Confusion Matrix:
 #[[1720  336]
@@ -472,12 +483,32 @@ best_thresholds.append(thresholds[np.argmax(youden_indices)])
 best_thresholds = np.array(best_thresholds)
 print(best_thresholds)
 
+# Convert probabilities to binary predictions using a threshold (e.g., 0.5)
+threshold = best_thresholds
+y_test_pred_binary = (y_test_pred > threshold).astype(int)
+
+# Generate a confusion matrix
+conf_matrix = confusion_matrix(y_test, y_test_pred_binary)
+
+# Display the confusion matrix
+print("Confusion Matrix:")
+print(conf_matrix)
+
+# Calculate sensitivity (recall)
+sensitivity = conf_matrix[1, 1] / (conf_matrix[1, 1] + conf_matrix[1, 0])
+
+# Calculate specificity
+specificity = conf_matrix[0, 0] / (conf_matrix[0, 0] + conf_matrix[0, 1])
+
+# Display the results
+print(f"Sensitivity (Recall): {sensitivity:.4f}")
+print(f"Specificity: {specificity:.4f}")
 
 # Save the best model for future use
-#joblib.dump(best_model, "/home/danny/Documents/Projects/lasi/python/clinical_dx/values/ind_clin/best_xgb_clin12.pkl")
+#joblib.dump(best_model, "/path/data/dir")
 
-#joblib.dump(all_shap_values_stacked, '/home/danny/Documents/Projects/lasi/python/clinical_dx/values/ind_clin/clin12_shap.joblib')
-#joblib.dump(all_val_data_stacked, '/home/danny/Documents/Projects/lasi/python/clinical_dx/values/ind_clin/clin12_values.joblib')
+#joblib.dump(all_shap_values_stacked, '/path/data/dir')
+#joblib.dump(all_val_data_stacked, '/path/data/dir')
 # Average SHAP values across all folds and plot summary
 #avg_shap_values = np.mean(all_shap_values, axis=0) 
 

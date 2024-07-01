@@ -11,7 +11,7 @@ library(broom)
 library(nlme)
 library(car)
 library(haven)
-library(shiny)
+#library(shiny)
 library(feather)
 ```
 
@@ -84,29 +84,29 @@ lasi_ml_data <- lasi_overall %>%
          r1pro_score,
          # Hindi Mental State Exam
          r1hmse_score,
-         r1hmse_scorz,
+         #r1hmse_scorz,
          # Center for Epidemiological Studies-Depression
          r1cesd10.x,
          # Trouble Concentrating
-         r1mindtsl,
+         r1mindts_d,
          # Felt Depressed
-         r1depresl,
-         # Everything an effor
-         r1effortl,
+         r1depres_d,
+         # Everything an effort
+         r1effort_d,
          # Felt Tired or low energy
-         r1ftiredl,
+         r1ftired_d,
          # Was Happy
-         r1whappyl,
+         r1whappy_d,
          # Felt lonely
-         r1flonel,
-         # Felt overall satisfied
-         r1fsatisl,
+         r1flone_d,
          # Felt afraid of something
-         r1fearfll,
+         r1fearl_d,
          # Felt hopeful
-         r1fhopel,
+         r1fhope_d,
+         # Enjoyed life
+         r1enlife_d,
          # Bothered by little things
-         r1botherl,
+         r1bother_d,
          # Anxiety Inventory (BAI)
          r1anx5,
          # BAI worst happening
@@ -121,7 +121,7 @@ lasi_ml_data <- lasi_overall %>%
          r1faint,
          # Informant Relationship with R
          r1inf_rel,
-         # Informant whether provides care for R
+         # Informant xwhether provides care for R
          r1inf_care,
          # Number of years informant know R
          r1inf_yrs,
@@ -129,17 +129,28 @@ lasi_ml_data <- lasi_overall %>%
          r1inf_freq,
          # Blessed Test Part 1 and 2 
          r1bl1score,
+         r1bl1_1,
+         r1bl1_2,
+         r1bl1_3,
+         r1bl1_4,
+         r1bl1_5,
+         r1bl1_6,
+         r1bl1_7,
+         r1bl1_8,
          r1bl2score,
-         # JORM Score
+         r1bl2_2r,
+         r1bl2_3r,
+         r1bl2_4r,
+         # IQCODE Score
          r1iqscore1:r1jormscore,
          # Telephone Interview for cognitive status
          r1scis:r1tics_score,
          # Hand sequencing test
-         r1ef_palm:r1ef_score,
+         #r1ef_palm:r1ef_score,
          # Token Test
-         r1tt_crcl:r1tt_score,
+         #r1tt_crcl:r1tt_score,
          # Judgement and Problem Solving 
-         r1jp_animl:r1pro_score,
+         r1jp_animl:r1jp_rupee2,
          # Cognitive Activity Score
          r1csi1:r1csi15,
          # Cognition Elbow
@@ -150,46 +161,18 @@ lasi_ml_data <- lasi_overall %>%
          r1store,
          # Cognition Point
          r1point,
-         # Word List Trial 1
-         r1word1,
-         # Word List Trial 2
-         r1word2,
-         # Word List Trial 3
-         r1word3,
-         # word learning total
-         r1word_total,
-         # Word List recognition original
-         r1wre_org,
-         # word list recognition new
-         r1wre_foil,
-         # word list recognition (org + foil)
-         r1wre_score,
+
          # Community Screening Interview for Dementia
          r1csid_score,
-         ## Brave man story
-         r1bm_s1:r1bm_recl_d,
-         ## Robbery story 
-         r1lmb_s1:r1lmb_recl_d,
-         # Logical memory recall
-         r1log_rcmix,
-         r1log_wron,
-         r1log_reco,
-         # Constructional Praxis
-         r1cp_circle:r1cpr_score,
-         # Clock Drawing
-         r1dr_clock3,
-         # Raven's test
-         r1rv_score,
-         # Go-no-go
-         r1go_score1:r1go_score,
+
          # Serial 7s
          r1ser7.x,
          # Symbol Cancellation
-         r1sc_anw,
+         #r1sc_anw,
          # Digit Span
-         r1ds_for:r1ds_back,
+         #r1ds_for:r1ds_back,
          # Retrieval fluency
-         r1verbal:r1verbal_prb,
+         #r1verbal:r1verbal_prb,
          ## Functional Scores
          # Total ADL
          r1adla_d,
@@ -275,7 +258,10 @@ lasi_ml_data <- lasi_overall %>%
          mh047,
          # neurological problems
          ht009,
+         ht009as1,
          r1cdr_incon,
+         r1compu1,
+         r1compu2,
          r1cdr_final,
          # Clinician Ratings
          r1cdr_final:r1raterid3,
@@ -367,12 +353,21 @@ long_lasi_ml <- lasi_ml_data2 %>%
   dplyr::select(!r1cdr_final) %>% 
   dplyr::select(!r1cdrmem_1:r1cdrscor_3)
 
-long_lasi_ind_clin <- long_lasi_ml %>%
-    pivot_longer(cols = c(r1raterid_1, r1raterid_2, r1raterid_3), 
+long_lasi_ind_clin <- lasi_ml_data2 %>%
+    pivot_longer(cols = c(r1raterid_1, r1raterid_2, r1raterid_3, r1cdrscor_1, r1cdrscor_2, r1cdrscor_3), 
    names_to = c('.value', 'grp'),
    names_pattern = "(.+)_(.+)") %>%
   dplyr::select(-grp) %>% 
-  dplyr::filter(!is.na(cdr))
+  mutate(cdr =
+           case_when(
+             r1cdrscor == 0 ~ 0,
+             r1cdrscor == 0.5 ~ 0,
+             r1cdrscor == 1 ~ 1,
+             r1cdrscor == 2 ~ 1,
+             r1cdrscor == 3 ~ 1,
+           )) %>% 
+  dplyr::filter(!is.na(cdr)) %>%
+  dplyr::select(!starts_with("r1cdr"))
 
 
 long_lasi_ml <- long_lasi_ml %>% 

@@ -66,6 +66,16 @@
     };
   })
 (pkgs.rPackages.buildRPackage {
+    name = "yardstick";
+    src = pkgs.fetchzip {
+      url = "https://cran.r-project.org/src/contrib/yardstick_1.3.1.tar.gz";
+      sha256 = "sha256-tGcjmaHQnmzAenLFMRZu7wXbPVQG83j3R2IMzJ6piCQ=";
+    };
+    propagatedBuildInputs = builtins.attrValues {
+      inherit (pkgs.rPackages) dplyr generics hardhat lifecycle rlang tibble tidyselect vctrs withr;
+    };
+  })
+(pkgs.rPackages.buildRPackage {
     name = "psych";
     src = pkgs.fetchzip {
       url = "https://cran.r-project.org/src/contrib/Archive/psych/psych_2.3.3.tar.gz";
@@ -83,6 +93,16 @@
     };
     propagatedBuildInputs = builtins.attrValues {
       inherit (pkgs.rPackages) htmltools htmlwidgets jsonlite magrittr crosstalk jquerylib promises;
+    };
+  })
+(pkgs.rPackages.buildRPackage {
+    name = "survey";
+    src = pkgs.fetchzip {
+      url = "https://cran.r-project.org/src/contrib/survey_4.4-2.tar.gz";
+      sha256 = "sha256-t3IQagejvGDzWXyO8yaMI4jO5TJ7mooJCF4b96dqXQw=";
+    };
+    propagatedBuildInputs = builtins.attrValues {
+      inherit (pkgs.rPackages) lattice minqa numDeriv mitools Rcpp survival RcppArmadillo;
     };
   })
 (pkgs.rPackages.buildRPackage {
@@ -115,16 +135,16 @@
       inherit (pkgs.rPackages) data_table Matrix;
     };
   })
-(pkgs.rPackages.buildRPackage {
-    name = "gt";
-    src = pkgs.fetchzip {
-      url = "https://cran.r-project.org/src/contrib/gt_0.10.0.tar.gz";
-      sha256 = "sha256-sBOuWiZH9VhARAlzvjgONUR/+/xoEJsAbmdK2AXk6mQ=";
-    };
-    propagatedBuildInputs = builtins.attrValues {
-      inherit (pkgs.rPackages) base64enc bigD bitops cli commonmark dplyr fs glue htmltools htmlwidgets juicyjuice magrittr markdown reactable rlang sass scales tibble tidyselect xml2;
-    };
-   })
+#(pkgs.rPackages.buildRPackage {
+#    name = "gt";
+#    src = pkgs.fetchzip {
+#      url = "https://cran.r-project.org/src/contrib/gt_0.10.0.tar.gz";
+#      sha256 = "sha256-sBOuWiZH9VhARAlzvjgONUR/+/xoEJsAbmdK2AXk6mQ=";
+#    };
+#    propagatedBuildInputs = builtins.attrValues {
+#      inherit (pkgs.rPackages) base64enc bigD bitops cli commonmark dplyr fs glue htmltools htmlwidgets juicyjuice magrittr markdown reactable rlang sass scales tibble tidyselect xml2;
+#    };
+#   })
  (pkgs.rPackages.buildRPackage {
     name = "gtExtras";
     src = pkgs.fetchzip {
@@ -155,26 +175,27 @@
       inherit (pkgs.rPackages) gridExtra foreach dplyr tidyselect tidyr purrr tibble ggplot2 Rcpp rlang;
     };
    })
-   (pkgs.rPackages.buildRPackage {
-    name = "WRS2";
-    src = pkgs.fetchzip {
-      url = "https://cran.r-project.org/src/contrib/WRS2_1.1-5.tar.gz";
-      sha256 = "sha256-vZL1izWHKZSWr4OrR/qXnTFo/GsZEaMV1l4FduY29b8=";
-    };
-    propagatedBuildInputs = builtins.attrValues {
-      inherit (pkgs.rPackages) MASS reshape plyr;
-    };
-   })
-(pkgs.rPackages.buildRPackage {
-    name = "flextable";
-    src = pkgs.fetchzip {
-      url = "https://cran.r-project.org/src/contrib/flextable_0.9.4.tar.gz";
-      sha256 = "sha256-2lVvyMYr33pN6DiSHbdrpr/uYCNZvvj4JYAdmONpBpc=";
-    };
-    propagatedBuildInputs = builtins.attrValues {
-      inherit (pkgs.rPackages) rmarkdown knitr htmltools data_table rlang ragg officer gdtools xml2 uuid;
-    };
-  })];
+#   (pkgs.rPackages.buildRPackage {
+#    name = "WRS2";
+#    src = pkgs.fetchzip {
+#      url = "https://cran.r-project.org/src/contrib/WRS2_1.1-5.tar.gz";
+#      sha256 = "sha256-vZL1izWHKZSWr4OrR/qXnTFo/GsZEaMV1l4FduY29b8=";
+#    };
+#    propagatedBuildInputs = builtins.attrValues {
+#      inherit (pkgs.rPackages) MASS reshape plyr;
+#    };
+#   })
+#(pkgs.rPackages.buildRPackage {
+#    name = "flextable";
+#    src = pkgs.fetchzip {
+#      url = "https://cran.r-project.org/src/contrib/flextable_0.9.4.tar.gz";
+#      sha256 = "sha256-2lVvyMYr33pN6DiSHbdrpr/uYCNZvvj4JYAdmONpBpc=";
+#    };
+#    propagatedBuildInputs = builtins.attrValues {
+#      inherit (pkgs.rPackages) rmarkdown knitr htmltools data_table rlang ragg officer gdtools xml2 uuid;
+#    };
+#  })
+];
  tex = (pkgs.texlive.combine {
   inherit (pkgs.texlive) scheme-basic ;
 });
